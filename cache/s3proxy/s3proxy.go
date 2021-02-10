@@ -9,6 +9,7 @@ import (
 
 	"github.com/buchgr/bazel-remote/cache"
 	"github.com/buchgr/bazel-remote/config"
+	"github.com/grailbio/base/file/s3file/s3transport"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/prometheus/client_golang/prometheus"
@@ -58,9 +59,10 @@ func New(s3Config *config.S3CloudStorageConfig, accessLogger cache.Logger,
 	if s3Config.AccessKeyID != "" && s3Config.SecretAccessKey != "" {
 		// Initialize minio client object.
 		opts := &minio.Options{
-			Creds:  credentials.NewStaticV4(s3Config.AccessKeyID, s3Config.SecretAccessKey, ""),
-			Secure: !s3Config.DisableSSL,
-			Region: s3Config.Region,
+			Creds:     credentials.NewStaticV4(s3Config.AccessKeyID, s3Config.SecretAccessKey, ""),
+			Transport: s3transport.Default,
+			Secure:    !s3Config.DisableSSL,
+			Region:    s3Config.Region,
 		}
 		minioCore, err = minio.NewCore(s3Config.Endpoint, opts)
 		if err != nil {
@@ -70,10 +72,10 @@ func New(s3Config *config.S3CloudStorageConfig, accessLogger cache.Logger,
 		// Initialize minio client object with IAM credentials
 		opts := &minio.Options{
 			// This config value may be empty.
-			Creds: credentials.NewIAM(s3Config.IAMRoleEndpoint),
-
-			Region: s3Config.Region,
-			Secure: !s3Config.DisableSSL,
+			Creds:     credentials.NewIAM(s3Config.IAMRoleEndpoint),
+			Transport: s3transport.Default,
+			Region:    s3Config.Region,
+			Secure:    !s3Config.DisableSSL,
 		}
 
 		minioClient, err := minio.New(
