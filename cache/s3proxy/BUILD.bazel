@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//cache:go_default_library",
         "//config:go_default_library",
+        "@com_github_grailbio_base//file/s3file/s3transport:go_default_library",
         "@com_github_minio_minio_go_v7//:go_default_library",
         "@com_github_minio_minio_go_v7//pkg/credentials:go_default_library",
         "@com_github_prometheus_client_golang//prometheus:go_default_library",
